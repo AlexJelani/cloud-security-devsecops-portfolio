@@ -1,0 +1,62 @@
+name: Terraform Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  security-scan:
+    name: Security Scan with Checkov
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Checkov on AWS
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: aws/
+          framework: terraform
+          soft_fail: false
+          output_format: cli
+          quiet: false
+
+      - name: Run Checkov on Azure
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: azure/
+          framework: terraform
+          soft_fail: false
+          output_format: cli
+          quiet: false
+
+  terraform-validate:
+    name: Terraform Validate
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cloud: [aws, azure]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ${{ matrix.cloud }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ${{ matrix.cloud }}
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+        working-directory: ${{ matrix.cloud }}

@@ -1,0 +1,59 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform/
+.terraform.lock.hcl
+crash.log
+override.tf
+override.tf.json
+
+# Cloud credentials
+*.pem
+*.key
+*.crt
+.aws/
+.azure/
+credentials
+config
+
+# Environment variables
+.env
+.env.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+*.egg-info/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Docker
+*.log
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+
+# Security scan results
+*.sarif
+trivy-results.json
+checkov-results.json
+
+# Secrets
+secrets/
+*.secret
+QUICK-START.md

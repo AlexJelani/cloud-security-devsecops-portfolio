@@ -1,0 +1,14 @@
+# Node
+node_modules/
+npm-debug.log
+package-lock.json
+
+# Docker
+*.log
+
+# Security scan results
+*.sarif
+trivy-results.*
+
+# OS
+.DS_Store
