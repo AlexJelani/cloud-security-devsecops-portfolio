@@ -17,16 +17,28 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run Gitleaks
+        id: gitleaks
+        continue-on-error: true
         run: |
           GITLEAKS_VERSION=8.24.3
           curl -sL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" -o /tmp/gitleaks.tar.gz
           tar -xzf /tmp/gitleaks.tar.gz -C /tmp
           chmod +x /tmp/gitleaks
-          /tmp/gitleaks detect --source 06-secret_testing --report-format sarif --report-path gitleaks.sarif 2>&1 | tee gitleaks-output.txt
+          /tmp/gitleaks detect --source 06-secret_testing --report-format text --report-path gitleaks.txt --exit-code 1 2>&1 | tee gitleaks-output.txt
+          echo "status=$?" >> $GITHUB_OUTPUT
       - name: Upload Gitleaks report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: gitleaks-report
           path: |
-            gitleaks.sarif
+            gitleaks.txt
             gitleaks-output.txt
+      - name: Show Gitleaks output on failure
+        if: always()
+        run: |
+          if grep -q 'Leaks found:' gitleaks-output.txt 2>/dev/null; then
+            echo '=== Gitleaks output ==='
+            cat gitleaks-output.txt
+            exit 1
+          fi
